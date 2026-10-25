@@ -24,6 +24,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Cluster kind éphémère
         uses: helm/kind-action@v1
+      - name: Namespace (cluster jetable)
+        run: kubectl create namespace uimad-ref
       - name: kubectl apply --dry-run=server
         run: kubectl apply --dry-run=server -f k8s/
 
