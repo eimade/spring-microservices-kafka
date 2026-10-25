@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: uimad-ref
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uimad-ref-config
+  namespace: uimad-ref
+data:
+  DB_URL: jdbc:postgresql://postgres:5432/uimadref
+  KAFKA_BOOTSTRAP: kafka:9092
+  MONGO_URI: mongodb://mongo:27017/uimadref
+  SEED_ENABLED: "true"
+  CORS_ORIGINS: http://localhost:18300
+---
+# Valeurs de démonstration : en réel, utiliser un gestionnaire de secrets (Sealed Secrets, External Secrets, Vault...)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: uimad-ref-secrets
+  namespace: uimad-ref
+type: Opaque
+stringData:
+  JWT_SECRET: demo-secret-uimad-ref-change-me-0123456789
+  DB_USER: uimadref
+  DB_PASSWORD: uimadref

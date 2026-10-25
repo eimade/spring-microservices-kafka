@@ -1,0 +1,35 @@
+server:
+  port: 18301
+
+spring:
+  application:
+    name: consumer
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27018/uimadref}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:19092}
+    consumer:
+      group-id: consumer-vue-lecture
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: ma.uimad.ref.consumer.ReferenceEvent
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: ma.uimad.ref.consumer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  kafka:
+    topic: reference-changes
+  jwt:
+    # Doit être identique à celui du service referentiel
+    secret: ${JWT_SECRET:demo-secret-uimad-ref-change-me-0123456789}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:18300}

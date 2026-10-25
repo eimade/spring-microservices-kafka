@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: referentiel
+  namespace: uimad-ref
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: referentiel } }
+  template:
+    metadata: { labels: { app: referentiel } }
+    spec:
+      containers:
+        - name: referentiel
+          image: uimad-ref/referentiel:1.0.0
+          ports: [{ containerPort: 18300 }]
+          envFrom:
+            - configMapRef: { name: uimad-ref-config }
+            - secretRef: { name: uimad-ref-secrets }
+          readinessProbe:
+            httpGet: { path: /actuator/health, port: 18300 }
+            initialDelaySeconds: 20
+          livenessProbe:
+            httpGet: { path: /actuator/health, port: 18300 }
+            initialDelaySeconds: 40
+          resources:
+            requests: { cpu: 200m, memory: 384Mi }
+            limits: { cpu: "1", memory: 768Mi }
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: referentiel
+  namespace: uimad-ref
+spec:
+  selector: { app: referentiel }
+  ports: [{ port: 18300, targetPort: 18300 }]

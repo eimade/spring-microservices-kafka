@@ -1,0 +1,50 @@
+server:
+  port: 18300
+
+spring:
+  application:
+    name: referentiel
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:15435/uimadref}
+    username: ${DB_USER:uimadref}
+    password: ${DB_PASSWORD:uimadref}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  flyway:
+    # {vendor} vaut "postgresql" ou "oracle" selon la base : un jeu de migrations par SGBD
+    locations: classpath:db/migration/{vendor}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:19092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+        max.block.ms: 10000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  kafka:
+    topic: reference-changes
+  seed:
+    enabled: ${SEED_ENABLED:true}
+  jwt:
+    # Secret de démonstration : à surcharger via JWT_SECRET (32 caractères minimum)
+    secret: ${JWT_SECRET:demo-secret-uimad-ref-change-me-0123456789}
+    ttl-seconds: 3600
+  security:
+    # Comptes de démonstration uniquement
+    users:
+      - username: editeur
+        password: ${EDITOR_PASSWORD:editeur123}
+        roles: [EDITOR]
+      - username: validateur
+        password: ${VALIDATOR_PASSWORD:validateur123}
+        roles: [VALIDATOR]
